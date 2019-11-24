@@ -53,10 +53,41 @@ class Parser():
 
             for key, value in self._validator[1].items():
                 pattern = r'<%s.*%s="%s"' % (self._validator[0], key, value)
-            print(pattern)
             chunk = re.compile(pattern)
             result = chunk.findall(rawHTML)
             if result != []:
                 status = True
 
         return status, rawHTML
+
+    def testValidationTags(self, targetUrls, commonUrls):
+        retData = {
+            'result': {'TP': 0, 'TN': 0, 'FP': 0, 'FN': 0},
+            'target': {'foundTag': [], 'emptyTag': [], 'errors': []},
+            'common': {'foundTag': [], 'emptyTag': [], 'errors': []}
+        }
+        for url in targetUrls:
+            status, rawHTML = self.urlValidate(url)
+            if status is True:
+                retData['result']['TP'] += 1
+                retData['target']['foundTag'].append(url)
+            elif status is False and rawHTML is not None:
+                retData['result']['FN'] += 1
+                retData['target']['emptyTag'].append(url)
+            else:
+                # print(url)
+                retData['target']['errors'].append(url)
+
+        for url in commonUrls:
+            status, rawHTML = self.urlValidate(url)
+            if status is True:
+                retData['result']['FP'] += 1
+                retData['common']['foundTag'].append(url)
+            elif status is False and rawHTML is not None:
+                retData['result']['TN'] += 1
+                retData['common']['emptyTag'].append(url)
+            else:
+                # print(url)
+                retData['common']['errors'].append(url)
+
+        return retData
