@@ -15,7 +15,7 @@ class ParcerClassTest(unittest.TestCase):
                       'shortDescTag': [],
                       'longDescTag': []}
         parser = Parser(**urlPrefs)
-        self.assertEqual(['main', {'itemtype': 'http://schema.org/Product'}], parser._validator)
+        self.assertEqual(['main', {'itemtype': 'http://schema.org/Product'}], parser._tags['validator'])
 
         urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
                       'nameTag': [],
@@ -147,11 +147,63 @@ class ParcerClassTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             status, result = parser.urlTagValidate('cutomTag', urlToOpen)
 
-        with self.assertRaises(UserWarning):
+        with self.assertRaises(ValueError):
             status, result = parser.urlTagValidate('nameTag', urlToOpen)
 
+
+    def test_smallValidationTagTester(self):
+
+        # stroyshopper
+        urlPrefs = {'validator': ['p', {'class': 'item_price'}],
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
+        parser = Parser(**urlPrefs)
+        status = result = None
+
+        targetUrls = [
+            'https://www.stroyshopper.ru/product/keramogranit_gracia_ceramica_aragon_dark_450kh450kh8/',
+            'https://www.stroyshopper.ru/product/kolesootbojnik_arec_ko500/',
+            'https://www.stroyshopper.ru/product/polukombinezon_muzhskoj_t_seryjchernyj/',
+            'https://www.stroyshopper.ru/product/bra_odeon_light_2838_1w/',
+            'https://www.stroyshopper.ru/product/komod_fink-44_mst-kuf-44-16_or/',
+            'https://www.stroyshopper.ru/product/oboi_limonta_tessuti_veneziani_27752/',
+            'https://www.stroyshopper.ru/product/stul_lt_c17451_walnutfabric/',
+            'https://www.stroyshopper.ru/product/krestiki-dlja-kafelja-25-mm/',
+            'https://www.stroyshopper.ru/product/rukav_rezinovyj_gost_18698-79_v_20-0_63_m/',
+            'https://www.stroyshopper.ru/product/drenazhnaja_asbestovaja_truba_d350_l-5_00/',
+            'https://www.stroyshopper.ru/product/germetik_kauchukovyj_tytan_professional_dla_krovli_chernyj_310_ml/',
+            'https://www.stroyshopper.ru/product/dubel_raspornyj_tchappai_sinij_5kh30_1_tys_sht/'
+        ]
+        commonUrls = [
+            'https://www.stroyshopper.ru/category/vanny/ifo/',
+            'https://www.stroyshopper.ru/category/rozetki_i_vyklyuchateli/rozetki_i_vykluchateli_cveta_goluboj/',
+            'https://www.stroyshopper.ru/brand/la-beaute/',
+            'https://www.stroyshopper.ru/brand/p-s-international/',
+            'https://www.stroyshopper.ru/brand/skyland/',
+            'https://www.stroyshopper.ru/brand/talkberg/',
+            'https://www.stroyshopper.ru/about/',
+            'https://www.stroyshopper.ru/']
+
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
+
+        self.assertEqual(len(targetUrls), result['result']['TP'])
+        self.assertEqual(len(commonUrls), result['result']['TN'])
+        self.assertEqual(0, result['result']['FP'])
+        self.assertEqual(0, result['result']['FN'])
+
+        self.assertEqual(len(targetUrls), len(result['target']['foundTag']))
+        self.assertEqual(len(commonUrls), len(result['common']['emptyTag']))
+        self.assertEqual(0, len(result['target']['emptyTag']))
+        self.assertEqual(0, len(result['common']['foundTag']))
+        self.assertEqual(0, len(result['target']['errors']))
+        self.assertEqual(0, len(result['common']['errors']))
+
+
     @unittest.skip("passed")
-    def test_validationTagTester(self):
+    def test_bigValidationTagTester(self):
 
         # stroyshopper
         urlPrefs = {'validator': ['p', {'class': 'item_price'}],

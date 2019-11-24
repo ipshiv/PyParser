@@ -19,12 +19,7 @@ class Parser():
              'longDescTag': []} - object contains long description (if avaible)
         """
         if self._checkdata(kwargs) is True:
-            self._validator = kwargs['validator']
-            self._nameTag = kwargs['nameTag']
-            self._priceTag = kwargs['priceTag']
-            self._measurmentTag = kwargs['measurmentTag']
-            self._shortDescTag = kwargs['shortDescTag']
-            self._longDescTag = kwargs['longDescTag']
+            self._tags = kwargs
         else:
             raise ValueError
 
@@ -77,50 +72,19 @@ class Parser():
         tag = ''
         prop = ''
         propName = ''
-        if tagName == 'validator':
-            if self._validator != []:
-                tag = self._validator[0]
-                for key, value in self._validator[1].items():
-                    prop = key
-                    propName = value
-        elif tagName == 'nameTag':
-            if self._nameTag != []:
-                tag = self._nameTag[0]
-                for key, value in self._nameTag[1].items():
-                    prop = key
-                    propName = value
-        elif tagName == 'priceTag':
-            if self._priceTag != []:
-                tag = self._priceTag[0]
-                for key, value in self._priceTag[1].items():
-                    prop = key
-                    propName = value
-        elif tagName == 'measurmentTag':
-            if self._priceTag != []:
-                tag = self._priceTag[0]
-                for key, value in self._priceTag[1].items():
-                    prop = key
-                    propName = value
-        elif tagName == 'shortDescTag':
-            if self._shortDescTag != []:
-                tag = self._shortDescTag[0]
-                for key, value in self._shortDescTag[1].items():
-                    prop = key
-                    propName = value
-        elif tagName == 'longDescTag':
-            if self._longDescTag != []:
-                tag = self._longDescTag[0]
-                for key, value in self._longDescTag[1].items():
-                    prop = key
-                    propName = value
-        else:
+        try:
+            tag, props = self._tags[tagName]
+        except KeyError:
             raise ValueError
-
-        if tag == '':
-            raise UserWarning
         else:
-            resPattern = r'<%s.*%s="%s"' % (tag, prop, propName)
-            return self.urlPatternValidate(resPattern, url)
+            if tag == '':
+                raise UserWarning
+            else:
+                for key, value in props.items():
+                    prop = key
+                    propName = value
+                resPattern = r'<%s.*%s="%s"' % (tag, prop, propName)
+                return self.urlPatternValidate(resPattern, url)
 
     def testUniqTag(self, tagName, targetUrls, commonUrls):
         """
