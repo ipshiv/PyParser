@@ -3,23 +3,54 @@ from parser.Parser import Parser
 
 class ParcerClassTest(unittest.TestCase):
 
-    @unittest.skip("passed")
+    def setUp(self):
+
+        self.tagToValidate = "validator"
+
+    def test_init(self):
+        urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
+                      'nameTag': [],
+                      'priceTag': [],
+                      'measurmentTag': [],
+                      'shortDescTag': [],
+                      'longDescTag': []}
+        parser = Parser(**urlPrefs)
+        self.assertEqual(['main', {'itemtype': 'http://schema.org/Product'}], parser._validator)
+
+        urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
+                      'nameTag': [],
+                      'priceTag': [],
+                      'shortDescTag': [],
+                      'longDescTag': []}
+        with self.assertRaises(ValueError):
+            parser = Parser(**urlPrefs)
+
+
+        urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
+                      'nameTag': [],
+                      'priceTag': [],
+                      'measurmentTag': '',
+                      'shortDescTag': [],
+                      'longDescTag': []}
+        with self.assertRaises(ValueError):
+            parser = Parser(**urlPrefs)
+
     def test_urlopen(self):
-        urlPrefs = {'validator': '',
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+        urlPrefs = {'validator': [],
+                      'nameTag': [],
+                      'priceTag': [],
+                      'measurmentTag': [],
+                      'shortDescTag': [],
+                      'longDescTag': []}
         parser = Parser(**urlPrefs)
 
         urlToOpen = 'https://santehnika-online.ru/product/akrilovaya_vanna_riho_miami_180_1656309/'
         result = parser.urlopen(urlToOpen)
         self.assertIsInstance(result, str)
 
-        urlToOpen = 'https://santehnika-online.ru/product/akrilovaya_1vanna_riho_miami_180_1656309/'
-        result = parser.urlopen(urlToOpen)
-        self.assertRaises(UserWarning)
+        urlToOpen = 'https://www.sdvor.com/moscow/'
+        with self.assertRaises(UserWarning):
+            result = parser.urlopen(urlToOpen)
 
         urlToOpen = 'https://www.ekonomstroy.ru/catalog/betonokontakt/gruntovka_starateli_beton_kontakt_20kg/'
         result = parser.urlopen(urlToOpen)
@@ -33,95 +64,102 @@ class ParcerClassTest(unittest.TestCase):
         result = parser.urlopen(urlToOpen)
         self.assertIsInstance(result, str)
 
-    @unittest.skip("passed")
+
     def test_urlvalidate(self):
 
         urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
         urlToOpen = 'https://santehnika-online.ru/product/akrilovaya_vanna_riho_miami_180_1656309/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
         status = result = None
 
         urlToOpen = 'https://santehnika-online.ru/product/akrilovaya_1vanna_riho_miami_180_1656309/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
         status = result = None
 
         urlToOpen = 'https://santehnika-online.ru/vanny/akrilovye/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
 
         urlPrefs = {'validator': ['span', {'class': 'span_price'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
         urlToOpen = 'https://www.ekonomstroy.ru/catalog/betonokontakt/gruntovka_starateli_beton_kontakt_20kg/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertTrue(status)
         status = result = None
 
         urlToOpen = 'https://www.ekonomstroy.ru/catalog/betonokontakt/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
 
         urlPrefs = {'validator': ['h1', {'class': 'container_title'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
         urlToOpen = 'https://www.sdvor.com/moscow/product/mastika-prikleivajuschaja-tehnonikol-no27-22-kg-37678/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertTrue(status)
         status = result = None
 
         urlToOpen = 'https://www.sdvor.com/moscow/category/obmazochnaja-gidroizoljatsija-5100/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
 
         urlPrefs = {'validator': ['p', {'class': 'item_price'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
         urlToOpen = 'https://www.stroyshopper.ru/product/keramogranit_gracia_ceramica_aragon_dark_450kh450kh8/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertTrue(status)
         status = result = None
 
         urlToOpen = 'https://www.stroyshopper.ru/category/gracia_ceramica_keramogranit/'
-        status, result = parser.urlValidate(urlToOpen)
+        status, result = parser.urlTagValidate(self.tagToValidate, urlToOpen)
         self.assertFalse(status)
 
+        with self.assertRaises(ValueError):
+            status, result = parser.urlTagValidate('cutomTag', urlToOpen)
+
+        with self.assertRaises(UserWarning):
+            status, result = parser.urlTagValidate('nameTag', urlToOpen)
+
+    @unittest.skip("passed")
     def test_validationTagTester(self):
 
         # stroyshopper
         urlPrefs = {'validator': ['p', {'class': 'item_price'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
@@ -149,7 +187,7 @@ class ParcerClassTest(unittest.TestCase):
             'https://www.stroyshopper.ru/about/',
             'https://www.stroyshopper.ru/']
 
-        result = parser.testValidationTags(targetUrls, commonUrls)
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
 
         self.assertEqual(len(targetUrls), result['result']['TP'])
         self.assertEqual(len(commonUrls), result['result']['TN'])
@@ -165,11 +203,11 @@ class ParcerClassTest(unittest.TestCase):
 
         # sdvor
         urlPrefs = {'validator': ['h1', {'class': 'container_title'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
@@ -208,7 +246,7 @@ class ParcerClassTest(unittest.TestCase):
             'https://www.sdvor.com/moscow/category/pakety-i-korobki-5016/'
             ]
 
-        result = parser.testValidationTags(targetUrls, commonUrls)
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
 
         self.assertEqual(len(targetUrls), result['result']['TP'])
         self.assertEqual(len(commonUrls), result['result']['TN'])
@@ -225,11 +263,11 @@ class ParcerClassTest(unittest.TestCase):
 
         # ekonomstroy
         urlPrefs = {'validator': ['span', {'class': 'span_price'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
@@ -263,7 +301,7 @@ class ParcerClassTest(unittest.TestCase):
             'https://www.ekonomstroy.ru/catalog/zazhimy_krokodily/'
             ]
 
-        result = parser.testValidationTags(targetUrls, commonUrls)
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
 
         self.assertEqual(len(targetUrls), result['result']['TP'])
         self.assertEqual(len(commonUrls), result['result']['TN'])
@@ -280,11 +318,11 @@ class ParcerClassTest(unittest.TestCase):
 
         # zergud
         urlPrefs = {'validator': ['div', {'class': 'product'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
@@ -323,7 +361,7 @@ class ParcerClassTest(unittest.TestCase):
             'http://zergud.ru/catalog/electroinstrumenty/gaykoverty/'
         ]
 
-        result = parser.testValidationTags(targetUrls, commonUrls)
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
 
         # print(result)
 
@@ -342,11 +380,11 @@ class ParcerClassTest(unittest.TestCase):
 
         # electro-mpo
         urlPrefs = {'validator': ['div', {'class': 'Microdata_product'}],
-                     'nameTag': '',
-                     'priceTag': '',
-                     'measurmentTag': '',
-                     'shortDescTag': '',
-                     'longDescTag': ''}
+                     'nameTag': [],
+                     'priceTag': [],
+                     'measurmentTag': [],
+                     'shortDescTag': [],
+                     'longDescTag': []}
         parser = Parser(**urlPrefs)
         status = result = None
 
@@ -383,7 +421,7 @@ class ParcerClassTest(unittest.TestCase):
             'https://www.electro-mpo.ru/about/',
         ]
 
-        result = parser.testValidationTags(targetUrls, commonUrls)
+        result = parser.testUniqTag(self.tagToValidate, targetUrls, commonUrls)
         print(result)
         self.assertEqual(len(targetUrls), result['result']['TP'])
         self.assertEqual(len(commonUrls), result['result']['TN'])
