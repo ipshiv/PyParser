@@ -1,5 +1,6 @@
 import re
 from urllib.request import urlopen, Request, URLError, HTTPError
+from bs4 import BeautifulSoup
 
 
 class Parser():
@@ -18,15 +19,15 @@ class Parser():
              'shortDescTag': [], - object contains short decription (if avaible)
              'longDescTag': []} - object contains long description (if avaible)
         """
+        self.__dataTypes = ['validator', 'nameTag', 'priceTag', 'measurmentTag', 'shortDescTag', 'longDescTag']
         if self._checkdata(kwargs) is True:
             self._tags = kwargs
         else:
             raise ValueError
 
     def _checkdata(self, initKwargs):
-        dataTypes = ['validator', 'nameTag', 'priceTag', 'measurmentTag', 'shortDescTag', 'longDescTag']
         valid = True
-        for type in dataTypes:
+        for type in self.__dataTypes:
             try:
                 res = initKwargs[type]
             except KeyError:
@@ -126,5 +127,23 @@ class Parser():
             else:
                 # print(url)
                 retData['common']['errors'].append(url)
+
+        return retData
+
+    def parseUrl(self, url):
+        retData = {'name': '',
+                   'price': '',
+                   'measurment': '',
+                   'shortDesc': '',
+                   'longDesc': '',
+                   'url': ''}
+        validator = self.__dataTypes[0]
+        status, html = self.urlTagValidate(validator, url)
+        if status is True:
+            soup = BeautifulSoup(html, 'html.parser')
+            for type in self.__dataTypes:
+                if self._tags[type][0] != '':
+                    retData[type.replace('Tag', '')] = soup.find(self._tags[type][0], self._tags[type][1]).get_text().strip()
+            retData['url'] = url
 
         return retData

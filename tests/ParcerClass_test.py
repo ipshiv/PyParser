@@ -64,7 +64,6 @@ class ParcerClassTest(unittest.TestCase):
         result = parser.urlopen(urlToOpen)
         self.assertIsInstance(result, str)
 
-
     def test_urlvalidate(self):
 
         urlPrefs = {'validator': ['main', {'itemtype': 'http://schema.org/Product'}],
@@ -150,7 +149,6 @@ class ParcerClassTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             status, result = parser.urlTagValidate('nameTag', urlToOpen)
 
-
     def test_smallValidationTagTester(self):
 
         # stroyshopper
@@ -200,7 +198,6 @@ class ParcerClassTest(unittest.TestCase):
         self.assertEqual(0, len(result['common']['foundTag']))
         self.assertEqual(0, len(result['target']['errors']))
         self.assertEqual(0, len(result['common']['errors']))
-
 
     @unittest.skip("passed")
     def test_bigValidationTagTester(self):
@@ -487,10 +484,76 @@ class ParcerClassTest(unittest.TestCase):
         self.assertEqual(0, len(result['target']['errors']))
         self.assertEqual(0, len(result['common']['errors']))
 
-"""
     def test_urlparse(self):
-        pass
-"""
+
+        urlPrefs = {'validator': ['div', {'class': 'Microdata_product'}],
+                     'nameTag': ['h1', {}],
+                     'priceTag': ['i', {'itemprop': 'price'}],
+                     'measurmentTag': ['', ''],
+                     'shortDescTag': ['div', {'class': 'description_tab_block'}],
+                     'longDescTag': ['', '']}
+        parser = Parser(**urlPrefs)
+        results = None
+
+        targetUrls = [
+            'https://www.electro-mpo.ru/catalog/svetilniki_svetodiodnye_svetilniki_i_lenty_prozhek/s05_svetodiodnye_prozhektory/s0579-prozhektor-b0043566-lpr-021-0-65k-100-220v-1/',
+            'https://www.electro-mpo.ru/catalog/lestnitsy_stremyanki_vyshki_tury/v62_stremyanki_bytovye_professionalnye/v6222-stremyanka-al160-bytovaya-alyuminievaya-6-st/',
+            ]
+
+        results = [{'name': 'С0579. Прожектор Б0043566 LPR-021-0-65K-100 220В 100Вт 8000Лм 6500К светодиодный IP65 (ЭРА)',
+                   'price': '1146.72',
+                   'measurment': '',
+                   'info': '<table id="card_pattern" width="300" border="0"> <tbody> </tbody><caption> <center> <span style="font-size: 20px; color: #032f89"> <b>Прожектор Б0043566 LPR-021-0-65K-100 220В 100 Вт 8000Лм 6500К светодиодный IP65 («ЭРА», Китай)</b> </span> </center> </caption><tbody><tr><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td></tr><tr><td id="cell_pattern" colspan="3" rowspan="1" valign="top"><table width="510"> <tbody> <tr class="px13"> <td>  Предназначен для освещения фасадов зданий, архитектурных сооружений, рекламных щитов, открытых территорий.<br> Материал корпуса: анодированный алюминий.<br> Материал рассеивателя: закалённое стекло.<br> Номинальное напряжение: 200-240 В, 50 Гц.<br> Номинальная мощность: 100 Вт (соответствует галогенной лампе 1000 Вт).<br>  Источник света: светодиоды (LED).<br> Цветовая температура: 6500 К (дневной свет).<br> Угол рассеивания: 120°.<br> Световой поток: 8000 лм. <br> Светоодача: 80 лм/Вт.<br> Степень защиты: IP65.<br> Коэффициент пульсации: менее 20%.<br> Индекс цветопередачи: 75.<br> Масса: 0,88 кг.<br> Срок службы: 30 000 часов.<br> Температура эксплуатации: от -40 °C до +45°C. <br> Габаритные размеры: 251х183х36 мм.<br> Сертификат: EAC.<br> Изготовитель: «ЭРА», Китай.<br> <b>Номер по прайс-листу: С0579.</b> </td></tr> </tbody> </table></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td id="cell_pattern" colspan="3" rowspan="1" valign="top">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>',
+                   'moreInfo': '',
+                   'url': 'https://www.electro-mpo.ru/catalog/svetilniki_svetodiodnye_svetilniki_i_lenty_prozhek/s05_svetodiodnye_prozhektory/s0579-prozhektor-b0043566-lpr-021-0-65k-100-220v-1/'},
+                   {'name': 'В6222. Стремянка AL160 бытовая алюминиевая 6 ступеней (Gierre)',
+                    'price': '5079.73',
+                    'measurment': '',
+                    'info': '<table id="card_pattern" width="300" border="0"> <tbody> </tbody><caption> <center> <span style="font-size: 20px; color: #032f89"> <b>Стремянка AL160 бытовая алюминиевая 6 ступеней («Gierre»)</b> </span> </center> </caption><tbody><tr><td id="cell_pattern" colspan="2" rowspan="7" valign="top">&nbsp;</td><td id="cell_pattern" colspan="2" rowspan="6" valign="top"><table width="500"> <tbody> <tr class="px13"> <td> Предназначена для бытового использования. <br> Рифлёная поверхность ступеней и платформ. <br> Платформы и ступени выдерживают нагрузку до 150 кг. <br> Изготовитель: «Gierre». </td> </tr> </tbody> </table></td></tr><tr></tr><tr></tr><tr></tr><tr></tr><tr></tr><tr><td id="cell_pattern" colspan="1" rowspan="1" valign="top">&nbsp;</td><td id="cell_pattern" colspan="1" rowspan="1" valign="top"><table width="400" height="185" cellspacing="0" border="1"> <tbody>  <tr class="px13" valign="center" align="center"> <td width="80">Марка</td> <td>Кол-во ступеней</td> <td>Высота платформы H от пола, м</td> <td>Масса, кг</td> <td><b>№ по п/л</b></td> </tr> <tr class="px13" valign="center" align="center">   <td>AL160</td>   <td>6</td>   <td>1,23</td>   <td>5,2</td>   <td><b>В6222</b></td> </tr> </tbody> </table></td></tr></tbody></table>',
+                    'moreInfo': '',
+                    'url': 'https://www.electro-mpo.ru/catalog/lestnitsy_stremyanki_vyshki_tury/v62_stremyanki_bytovye_professionalnye/v6222-stremyanka-al160-bytovaya-alyuminievaya-6-st/'},
+                    ]
+
+        for i, url in enumerate(targetUrls):
+            parced = parser.parseUrl(url)
+            self.assertEqual(results[i]['name'], parced['name'])
+            self.assertEqual(results[i]['price'], parced['price'])
+            self.assertEqual(results[i]['url'], parced['url'])
+
+        # ekonomstroy
+        urlPrefs = {'validator': ['span', {'class': 'span_price'}],
+                     'nameTag': ['h1', {'class': 'bx-title dbg_title'}],
+                     'priceTag': ['span', {'class': 'span_price'}],
+                     'measurmentTag': ['', ''],
+                     'shortDescTag': ['div', {'class': 'descr'}],
+                     'longDescTag': ['', '']}
+        parser = Parser(**urlPrefs)
+        results = None
+
+        targetUrls = [
+            'https://www.ekonomstroy.ru/catalog/kley_plitochnyy/kley_plitochnyy_veber_vetonit_granit_fiks_25kg/',
+            'https://www.ekonomstroy.ru/catalog/chayniki/chaynik_nerzh_3_0l_art_tm_deco_hy_3807_12_so_svistkom/'
+            ]
+
+        results = [{'name': 'Клей плиточный Weber Vetonit Granit Fix 25 кг 1009950',
+                   'price': '450 руб. /\n шт',
+                   'measurment': '',
+                   'info': '',
+                   'moreInfo': '',
+                   'url': 'https://www.ekonomstroy.ru/catalog/kley_plitochnyy/kley_plitochnyy_veber_vetonit_granit_fiks_25kg/'},
+                   {'name': 'Чайник нержавейка 3,0 л арт. ТМ DECO.HY-3807 (12) со свистком',
+                    'price': '1 330 руб. /\n шт',
+                    'measurment': '',
+                    'info': '',
+                    'moreInfo': '',
+                    'url': 'https://www.ekonomstroy.ru/catalog/chayniki/chaynik_nerzh_3_0l_art_tm_deco_hy_3807_12_so_svistkom/'},
+        ]
+
+        for i, url in enumerate(targetUrls):
+            parced = parser.parseUrl(url)
+            self.assertEqual(results[i]['name'], parced['name'])
+            self.assertEqual(results[i]['price'], parced['price'])
+            self.assertEqual(results[i]['url'], parced['url'])
 
 
 if __name__ == '__main__':
